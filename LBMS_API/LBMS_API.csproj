@@ -13,6 +13,7 @@
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SQLite" Version="9.0.1" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.0.9" />
     </ItemGroup>
 
 </Project>
