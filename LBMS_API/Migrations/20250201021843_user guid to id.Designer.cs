@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using LBMS_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,18 +12,20 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LBMS_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250201021843_user guid to id")]
+    partial class userguidtoid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
 
             modelBuilder.Entity("LBMS_API.Models.Book", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Author")
                         .IsRequired()
@@ -50,7 +53,7 @@ namespace LBMS_API.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<bool>("CanBeMainCategory")
+                            b1.Property<bool>("CanBeSubCategory")
                                 .HasColumnType("INTEGER");
 
                             b1.Property<int>("ID")
@@ -83,7 +86,7 @@ namespace LBMS_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("CanBeMainCategory")
+                    b.Property<bool>("CanBeSubCategory")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -106,8 +109,8 @@ namespace LBMS_API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("BookID")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("BookID")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("BorrowDate")
                         .HasColumnType("TEXT");

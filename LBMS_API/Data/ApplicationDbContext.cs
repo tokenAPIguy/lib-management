@@ -15,7 +15,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.HasKey(c => c.ID);
             
             e.Property(c => c.Name).IsRequired();
-            e.Property(c => c.CanBeSubCategory).IsRequired();
+            e.Property(c => c.CanBeMainCategory).IsRequired();
 
         });
         
