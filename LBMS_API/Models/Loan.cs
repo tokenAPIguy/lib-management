@@ -2,8 +2,8 @@ namespace LBMS_API.Models;
 
 public class Loan {
     public Guid ID { get; set; }
-    public Guid BookID { get; set; }
-    public Guid UserID { get; set; }
+    public int BookID { get; set; }
+    public int UserID { get; set; }
     public DateOnly BorrowDate { get; set; }
     public DateOnly DueDate { get; set; }
     public DateOnly? ReturnedDate { get; set; }

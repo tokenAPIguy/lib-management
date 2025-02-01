@@ -1,7 +1,7 @@
 namespace LBMS_API.Models;
 
 public class Book {
-    public Guid ID { get; set; }
+    public int ID { get; set; }
     public string Name { get; set; }
     public string Author { get; set; }
     public string ISBN { get; set; }
