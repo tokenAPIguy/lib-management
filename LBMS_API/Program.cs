@@ -1,13 +1,16 @@
 using LBMS_API.Data;
+using LBMS_API.Data.DTO;
+using LBMS_API.Models;
+using LBMS_API.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
@@ -17,20 +20,18 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/v1", () => "Hello World!");
+app.MapGet("/api/", () => "Hello World!");
 
-app.MapGet("/api/v1/categories", async (ApplicationDbContext db) => {
-    var categories = await db.Categories.ToListAsync();
-    return Results.Ok(categories);
-});
+app.MapGet("/api/v1/books", async (int? id, ApplicationDbContext db) => await new BookService(db).Get(id));
+app.MapPost("/api/v1/books", async (BookDTO obj, ApplicationDbContext db) => await new BookService(db).Post(obj));
 
-app.MapGet("/api/v1/categories/{category}", async (string category, ApplicationDbContext db) => {
-    var categories = await db.Categories.Where(c => c.Name == category).ToListAsync();
-    return Results.Ok(categories);
-});
+app.MapGet("/api/v1/users", async (int? id, ApplicationDbContext db) => await new UserService(db).Get(id));
+app.MapPost("/api/v1/users", async (UserDTO obj, ApplicationDbContext db) => await new UserService(db).Post(obj));
+
+app.MapGet("/api/v1/loans", async (Guid? id, ApplicationDbContext db) => await new LoanService(db).Get(id));
+app.MapPost("/api/v1/loans", async (LoanDTO obj, ApplicationDbContext db) => await new LoanService(db).Post(obj));
+
+app.MapGet("/api/v1/categories", async (int? id, ApplicationDbContext db) => await new CategoryService(db).Get(id));
+app.MapPost("/api/v1/categories", async (CategoryDTO obj, ApplicationDbContext db) => await new CategoryService(db).Post(obj));
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary) {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
