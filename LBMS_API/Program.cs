@@ -10,6 +10,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,8 +20,6 @@ if (app.Environment.IsDevelopment()) {
 }
 
 app.UseHttpsRedirection();
-
-app.MapGet("/api/", () => "Hello World!");
 
 app.MapGet("/api/v1/books", async (int? id, ApplicationDbContext db) => await new BookService(db).Get(id));
 app.MapPost("/api/v1/books", async (BookDTO obj, ApplicationDbContext db) => await new BookService(db).Post(obj));

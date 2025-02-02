@@ -27,18 +27,46 @@ public class UserService(ApplicationDbContext db) {
     
     [HttpPost]
     public async Task<IResult> Post(UserDTO obj) {
+        
+        if (obj.Role == UserRole.Employee || obj.Role == UserRole.Admin) {
+            try {
+                Employee employee = new() {
+                    Role =  obj.Role,
+                    FirstName = obj.FirstName,
+                    MiddleInitial = obj.MiddleInitial ?? null,
+                    LastName = obj.LastName,
+                    UserName = obj.UserName,
+                    Email = obj.Email,
+                    BirthDate = obj.BirthDate,
+                    Address = obj.Address,
+                    AccountCreationDate = DateOnly.FromDateTime(DateTime.Now),
+                    Discriminator = "EMPLOYEE",
+                    IsAdmin = obj.Role == UserRole.Admin 
+                };
+            
+                db.Add(employee);
+                await db.SaveChangesAsync();
+                return Results.Created();
+            } catch (Exception e) {
+                // log e.stacktrace
+                return Results.Problem(e.Message, statusCode: 500);
+            }
+        }
+        
         try {
-            User user = new() {
+            Patron patron = new() {
+                Role = UserRole.Patron,
                 FirstName = obj.FirstName,
                 MiddleInitial = obj.MiddleInitial ?? null,
                 LastName = obj.LastName,
                 UserName = obj.UserName,
                 Email = obj.Email,
                 BirthDate = obj.BirthDate,
-                Address = obj.Address
+                Address = obj.Address,
+                Discriminator = "PATRON"
             };
-            
-            db.Add(user);
+        
+            db.Add(patron);
             await db.SaveChangesAsync();
             return Results.Created();
         } 

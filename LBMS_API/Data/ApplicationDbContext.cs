@@ -69,7 +69,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.HasIndex(u => u.UserName).IsUnique();
             e.HasIndex(u => u.Email).IsUnique();
             
-            
             e.Property(u => u.FirstName).IsRequired();
             e.Property(u => u.MiddleInitial);
             e.Property(u => u.LastName).IsRequired();
@@ -77,10 +76,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.Property(u => u.Email).IsRequired();
             e.Property(u => u.Address).IsRequired();
             e.Property(u => u.BirthDate).IsRequired();
+            e.Property(u => u.AccountCreationDate).IsRequired();
+            e.Property(u => u.Discriminator).IsRequired();
+            e.Property(u => u.Role).IsRequired();
                 
             e.HasMany(u => u.Loans)
                 .WithOne(b => b.User)
-                .HasForeignKey(l => l.UserID);
+                .HasForeignKey(l => l.UserID)
+                .IsRequired();
             e.HasMany(u => u.CategoryHistory)
                 .WithMany();
         });
