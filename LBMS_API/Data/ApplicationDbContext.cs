@@ -65,8 +65,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<User>(e =>
         {
             e.HasKey(u => u.ID);
+
             e.HasIndex(u => u.UserName).IsUnique();
             e.HasIndex(u => u.Email).IsUnique();
+            
             
             e.Property(u => u.FirstName).IsRequired();
             e.Property(u => u.MiddleInitial);
@@ -79,10 +81,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.HasMany(u => u.Loans)
                 .WithOne(b => b.User)
                 .HasForeignKey(l => l.UserID);
+            e.HasMany(u => u.CategoryHistory)
+                .WithMany();
         });
-
-
-        // User
     }
 }
 

@@ -1,42 +1,37 @@
 using LBMS_API.Data;
+using LBMS_API.Data.DTO;
+using LBMS_API.Models;
+using LBMS_API.Services;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[] {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapGet("/api/", () => "Hello World!");
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+app.MapGet("/api/v1/books", async (int? id, ApplicationDbContext db) => await new BookService(db).Get(id));
+app.MapPost("/api/v1/books", async (BookDTO obj, ApplicationDbContext db) => await new BookService(db).Post(obj));
+
+app.MapGet("/api/v1/users", async (int? id, ApplicationDbContext db) => await new UserService(db).Get(id));
+app.MapPost("/api/v1/users", async (UserDTO obj, ApplicationDbContext db) => await new UserService(db).Post(obj));
+
+app.MapGet("/api/v1/loans", async (Guid? id, ApplicationDbContext db) => await new LoanService(db).Get(id));
+app.MapPost("/api/v1/loans", async (LoanDTO obj, ApplicationDbContext db) => await new LoanService(db).Post(obj));
+
+app.MapGet("/api/v1/categories", async (int? id, ApplicationDbContext db) => await new CategoryService(db).Get(id));
+app.MapPost("/api/v1/categories", async (CategoryDTO obj, ApplicationDbContext db) => await new CategoryService(db).Post(obj));
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary) {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
