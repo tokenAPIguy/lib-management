@@ -25,6 +25,28 @@ public class LoanService(ApplicationDbContext db) {
             : Results.NotFound();
     }
 
+    [HttpPut]
+    public async Task<IResult> Put(Guid? id, LoanDTO obj) {
+        try {
+            Loan? loan = await db.Loans.FindAsync(id);
+
+            if (loan == null) {
+                return Results.NotFound();
+            }
+            
+            loan.ReturnedDate = DateOnly.FromDateTime(DateTime.Now);
+            loan.Status = LoanStatus.Returned;
+            
+            db.Update(loan);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+
+        }
+        catch (Exception e) {
+            return Results.Problem(e.Message, statusCode: 500);
+        }    
+    }
+    
     [HttpPost]
     public async Task<IResult> Post(LoanDTO obj) {
         try {

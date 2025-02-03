@@ -34,7 +34,7 @@ public class BookService(ApplicationDbContext db) {
                 ISBN = obj.ISBN,
                 Description = obj.Description,
                 CategoryID = obj.Category.ID,
-                SubCategoryIDs = obj.SubCategories,
+                SubCategoryIDs = string.Join(",", obj.SubCategories.Select(s => s.ID)),
                 IsAvailable = true
             };
             
@@ -44,6 +44,51 @@ public class BookService(ApplicationDbContext db) {
         }
         catch (Exception e) {
             return Results.Problem(e.Message, statusCode: 500);
+        }
+    }
+
+    [HttpPut]
+    public async Task<IResult> Put(BookDTO obj) {
+        try {
+            List<Book>? books = await db.Books
+                .Where(b => b.Name == obj.Name)
+                .ToListAsync();
+
+            if (!books.Any()) {
+                return Results.NotFound();
+            }
+
+            List<int> foo = (obj.SubCategories.Select(x => x.ID)).ToList();
+            string bar = string.Join(",", foo);
+
+            foreach (Book book in books) {
+                book.CategoryID = obj.Category.ID;
+                book.SubCategoryIDs = bar;
+            }
+            
+            return Results.Ok();
+        }
+        catch (Exception e) {
+            return Results.Problem(e.Message, statusCode: 500);            
+        }
+    }
+    
+    
+    [HttpDelete]
+    public async Task<IResult> Delete(int? id) {
+        try {
+            Book? book = await db.Books.FindAsync(id);
+
+            if (book == null) {
+                return Results.NotFound();    
+            }
+            
+            db.Remove(book);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+        }
+        catch (Exception e) {
+            return Results.Problem(e.Message, statusCode: 500);            
         }
     }
 }

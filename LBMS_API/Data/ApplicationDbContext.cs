@@ -17,6 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50);
+            entity.HasIndex(e => e.Name).IsUnique();
 
             entity.Property(e => e.CanBeMainCategory)
                 .IsRequired();

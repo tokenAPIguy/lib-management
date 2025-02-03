@@ -42,4 +42,49 @@ public class CategoryService(ApplicationDbContext db) {
             return Results.Problem(e.Message, statusCode: 500);
         }
     }
+    
+    [HttpPut]
+    public async Task<IResult> Put(int? id, CategoryDTO obj) {
+        try {
+            Category? category = await db.Categories.FindAsync(id);
+
+            if (category == null) {
+                return Results.NotFound();
+            }
+            
+            category.CanBeMainCategory = obj.CanBeMainCategory;
+            db.Update(category);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+        }
+        catch (Exception e) {
+            return Results.Problem(e.Message, statusCode: 500);
+        }
+
+    }
+
+    [HttpDelete]
+    public async Task<IResult> Delete(int? id) {
+        try {
+            Category? category = await db.Categories.FindAsync(id);
+
+            if (category == null) {
+                return Results.NotFound();
+            }
+            
+            bool categoryIsInUse = await db.Books.AnyAsync(b => b.CategoryID == id);
+            if (categoryIsInUse) {
+                return Results.BadRequest("Category is in use.");
+            }
+            
+            db.Categories.Remove(category);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+        }
+        catch (Exception e) {
+            return Results.Problem(e.Message, statusCode: 500);
+        }
+    }
+
+
 }

@@ -74,4 +74,43 @@ public class UserService(ApplicationDbContext db) {
             return Results.Problem(e.Message, statusCode: 500);
         }
     }
+
+    [HttpPut]
+    public async Task<IResult> Put(int? id, UserDTO obj) {
+        User? user = await db.Users.FindAsync(id);
+
+        if (user == null) {
+            return Results.NotFound();
+        }
+        
+        user.FirstName = obj.FirstName;
+        user.MiddleInitial = obj.MiddleInitial;
+        user.LastName = obj.LastName;
+        user.Email = obj.Email;
+        user.Address = obj.Address;
+        user.Role = obj.Role;
+        user.Discriminator = obj.Role == UserRole.Employee || obj.Role == UserRole.Admin ? "EMPLOYEE" : "PATRON";
+        
+        db.Update(user);
+        await db.SaveChangesAsync();
+        return Results.Ok();
+    }
+    
+    [HttpDelete]
+    public async Task<IResult> Delete(int? id) {
+        try {
+            User? user = await db.Users.FindAsync(id);
+
+            if (user == null) {
+                return Results.NotFound();
+            }
+            
+            db.Remove(user);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+        }
+        catch (Exception e) {
+            return Results.Problem(e.Message, statusCode: 500);
+        }
+    }
 }
