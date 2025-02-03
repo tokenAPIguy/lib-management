@@ -6,6 +6,6 @@ public class Employee : User {
     [Required]
     public new UserRole Role { get; set; } = UserRole.Employee;
     
-    [Required]
-    public bool IsAdmin { get; set; } = false;
+    // [Required]
+    // public bool IsAdmin { get; set; } = false;
 }

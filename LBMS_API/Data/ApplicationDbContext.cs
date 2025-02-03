@@ -10,82 +10,127 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Category> Categories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) { // Category
-        modelBuilder.Entity<Category>(e =>
-        {
-            e.HasKey(c => c.ID);
-            
-            e.Property(c => c.Name).IsRequired();
-            e.Property(c => c.CanBeMainCategory).IsRequired();
+        modelBuilder.Entity<Category>(entity => {
+            entity.HasKey(e => e.ID);
+            entity.Property(e => e.ID).UseIdentityColumn();
 
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.CanBeMainCategory)
+                .IsRequired();
         });
         
-        modelBuilder.Entity<Book>(e =>
+        modelBuilder.Entity<Book>(entity =>
         {
-            e.HasKey(b => b.ID);
-            e.HasIndex(b => b.ISBN).IsUnique();
+            entity.HasKey(e => e.ID);
+            entity.Property(e => e.ID).UseIdentityColumn();
 
-            e.Property(b => b.Name).IsRequired();
-            e.Property(b => b.Author).IsRequired();
-            e.Property(b => b.ISBN).IsRequired();
-            e.ComplexProperty(b => b.SubCategories).IsRequired();
-            e.Property(b => b.Description).IsRequired();
-            e.Property(b => b.Rating);
-            e.Property(b => b.IsAvailable).IsRequired();
-            e.ComplexProperty(b => b.Category).IsRequired();
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Author)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ISBN)
+                .HasMaxLength(20);
             
-            e.HasMany(b => b.LoanHistory)
-                .WithOne(b => b.Book)
-                .HasForeignKey(l => l.BookID);
+            entity.Property(e => e.CategoryID)
+                .HasMaxLength(50);
             
+            entity.Property(e => e.SubCategoryIDs)
+                .HasMaxLength(500);
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(500);
+
+            entity.Property(e => e.Rating)
+                .IsRequired(false);
+
+            entity.Property(e => e.IsAvailable)
+                .IsRequired();
+        });
+        
+
+        modelBuilder.Entity<Loan>(entity =>
+        {
+            entity.HasKey(e => e.ID);
+
+            entity.Property(e => e.BookID)
+                .IsRequired();
+
+            entity.Property(e => e.UserID)
+                .IsRequired();
+
+            entity.Property(e => e.BorrowDate)
+                .IsRequired();
+
+            entity.Property(e => e.DueDate)
+                .IsRequired();
+
+            entity.Property(e => e.ReturnedDate)
+                .IsRequired(false);
+
+            entity.Property(e => e.Status)
+                .IsRequired();
+
+            // Foreign key relationships
+            entity.HasOne(e => e.Book)
+                .WithMany()
+                .HasForeignKey(e => e.BookID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<Loan>(e =>
+        modelBuilder.Entity<User>(entity =>
         {
-            e.HasKey(l => l.ID);
-            
-            e.Property(l => l.BookID).IsRequired();
-            e.Property(l => l.UserID).IsRequired();
-            e.Property(l => l.BorrowDate).IsRequired();
-            e.Property(l => l.DueDate).IsRequired();
-            e.Property(l => l.ReturnedDate).IsRequired();
-            e.Property(l => l.Status)
-                .HasConversion(
-                    l => l.ToString(), 
-                    l => Enum.Parse<LoanStatus>(l))
-                .IsRequired();
-            
-            e.HasOne(l => l.Book)
-                .WithMany(b => b.LoanHistory)
-                .HasForeignKey(l => l.BookID);
-            e.HasOne(l => l.User)
-                .WithMany(u => u.Loans)
-                .HasForeignKey(l => l.UserID);
-        });
+            entity.HasKey(e => e.ID);
+            entity.Property(e => e.ID).UseIdentityColumn();
 
-        modelBuilder.Entity<User>(e =>
-        {
-            e.HasKey(u => u.ID);
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(25);
 
-            e.HasIndex(u => u.UserName).IsUnique();
-            e.HasIndex(u => u.Email).IsUnique();
-            
-            e.Property(u => u.FirstName).IsRequired();
-            e.Property(u => u.MiddleInitial);
-            e.Property(u => u.LastName).IsRequired();
-            e.Property(u => u.UserName).IsRequired();
-            e.Property(u => u.Email).IsRequired();
-            e.Property(u => u.Address).IsRequired();
-            e.Property(u => u.BirthDate).IsRequired();
-            e.Property(u => u.AccountCreationDate).IsRequired();
-            e.Property(u => u.Discriminator).IsRequired();
-            e.Property(u => u.Role).IsRequired();
-                
-            e.HasMany(u => u.Loans)
-                .WithOne(b => b.User)
-                .HasForeignKey(l => l.UserID)
+            entity.Property(e => e.MiddleInitial)
+                .HasMaxLength(1)
+                .IsRequired(false);
+
+            entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.UserName)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.HasIndex(e => e.UserName).IsUnique();
+
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.HasIndex(e => e.Email).IsUnique();
+
+            entity.Property(e => e.Address)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.BirthDate)
                 .IsRequired();
-            e.HasMany(u => u.CategoryHistory)
-                .WithMany();
+
+            entity.Property(e => e.AccountCreationDate)
+                .IsRequired()
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.Discriminator)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Role)
+                .HasMaxLength(50);
         });
     }
 }

@@ -33,8 +33,8 @@ public class BookService(ApplicationDbContext db) {
                 Author = obj.Author,
                 ISBN = obj.ISBN,
                 Description = obj.Description,
-                Category = obj.Category,
-                SubCategories = obj.SubCategories,
+                CategoryID = obj.Category.ID,
+                SubCategoryIDs = obj.SubCategories,
                 IsAvailable = true
             };
             

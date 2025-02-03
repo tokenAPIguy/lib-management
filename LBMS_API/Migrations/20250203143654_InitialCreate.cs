@@ -15,39 +15,20 @@ namespace LBMS_API.Migrations
                 name: "Books",
                 columns: table => new
                 {
-                    ID = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Author = table.Column<string>(type: "TEXT", nullable: false),
-                    ISBN = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Author = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    ISBN = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    CategoryID = table.Column<int>(type: "INTEGER", maxLength: 50, nullable: false),
+                    SubCategoryIDs = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     Rating = table.Column<double>(type: "REAL", nullable: true),
-                    IsAvailable = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Category_CanBeSubCategory = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Category_ID = table.Column<int>(type: "INTEGER", nullable: false),
-                    Category_Name = table.Column<string>(type: "TEXT", nullable: false),
-                    SubCategories_Capacity = table.Column<int>(type: "INTEGER", nullable: false)
+                    IsAvailable = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Books", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    ID = table.Column<Guid>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    MiddleInitial = table.Column<string>(type: "TEXT", nullable: true),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    UserName = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    BirthDate = table.Column<DateOnly>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -56,18 +37,34 @@ namespace LBMS_API.Migrations
                 {
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    CanBeSubCategory = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UserID = table.Column<Guid>(type: "TEXT", nullable: true)
+                    Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    CanBeMainCategory = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Categories_Users_UserID",
-                        column: x => x.UserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FirstName = table.Column<string>(type: "TEXT", maxLength: 25, nullable: false),
+                    MiddleInitial = table.Column<string>(type: "TEXT", maxLength: 1, nullable: true),
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    UserName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    BirthDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    AccountCreationDate = table.Column<DateOnly>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
+                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Role = table.Column<int>(type: "INTEGER", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -75,12 +72,12 @@ namespace LBMS_API.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BookID = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserID = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BookID = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserID = table.Column<int>(type: "INTEGER", nullable: false),
                     BorrowDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     DueDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    ReturnedDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", nullable: false)
+                    ReturnedDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,25 +87,14 @@ namespace LBMS_API.Migrations
                         column: x => x.BookID,
                         principalTable: "Books",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Loans_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Books_ISBN",
-                table: "Books",
-                column: "ISBN",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Categories_UserID",
-                table: "Categories",
-                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Loans_BookID",

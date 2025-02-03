@@ -40,8 +40,7 @@ public class UserService(ApplicationDbContext db) {
                     BirthDate = obj.BirthDate,
                     Address = obj.Address,
                     AccountCreationDate = DateOnly.FromDateTime(DateTime.Now),
-                    Discriminator = "EMPLOYEE",
-                    IsAdmin = obj.Role == UserRole.Admin 
+                    Discriminator = obj.Role == UserRole.Employee ? "EMPLOYEE" : "ADMIN",
                 };
             
                 db.Add(employee);

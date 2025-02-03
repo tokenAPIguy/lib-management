@@ -19,9 +19,9 @@ public class Book {
     public string ISBN { get; set; }
     
     [Required]
-    public Category Category { get; set; }
+    public int CategoryID { get; set; }
     
-    public List<Category>? SubCategories { get; set; } = [];
+    public string SubCategoryIDs { get; set; }
     
     [Required]
     public string Description { get; set; }
@@ -31,5 +31,5 @@ public class Book {
     [Required]
     public bool IsAvailable { get; set; }
     
-    public ICollection<Loan>? LoanHistory { get; set; } = new List<Loan>();
+    // public ICollection<Loan>? LoanHistory { get; set; } = new List<Loan>();
 }

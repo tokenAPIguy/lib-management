@@ -39,9 +39,9 @@ public class User {
     [Required]
     public UserRole Role { get; set; }
     
-    public ICollection<Loan> Loans { get; set; } = new List<Loan>(); // Move to Patron
+    // public ICollection<Loan> Loans { get; set; } = new List<Loan>(); // Move to Patron
     
-    public ICollection<Category> CategoryHistory { get; set; } = new List<Category>(); // Move to Patron
+    // public ICollection<Category> CategoryHistory { get; set; } = new List<Category>(); // Move to Patron
 }
 
 public enum UserRole {
